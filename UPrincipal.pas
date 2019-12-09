@@ -46,6 +46,7 @@ type
     ppbtnSair: TMenuItem;
     popbtnProcessarAgora: TMenuItem;
     fdQuery2: TFDQuery;
+    LabeledEdit1: TLabeledEdit;
     procedure pnTopMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure btnSairClick(Sender: TObject);

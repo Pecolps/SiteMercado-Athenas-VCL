@@ -451,7 +451,7 @@ object frmPrincipal: TfrmPrincipal
         end
       end
       object gbConfig: TGroupBox
-        Left = 263
+        Left = 265
         Top = 112
         Width = 342
         Height = 200
@@ -459,7 +459,7 @@ object frmPrincipal: TfrmPrincipal
         TabOrder = 2
         object edIntervalo: TLabeledEdit
           Left = 16
-          Top = 83
+          Top = 163
           Width = 97
           Height = 21
           EditLabel.Width = 98
@@ -480,6 +480,23 @@ object frmPrincipal: TfrmPrincipal
           Top = 40
           Width = 313
           Height = 21
+          EditLabel.Width = 298
+          EditLabel.Height = 13
+          EditLabel.Caption = 'Caminho Integra'#231#227'o (produtos.csv, clientes.csv, pedidos.csv)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 1
+          Text = 'C:\Integracao\'
+        end
+        object LabeledEdit1: TLabeledEdit
+          Left = 16
+          Top = 80
+          Width = 313
+          Height = 21
           EditLabel.Width = 159
           EditLabel.Height = 13
           EditLabel.Caption = 'Caminho de Sa'#237'da (produtos.csv)'
@@ -489,7 +506,7 @@ object frmPrincipal: TfrmPrincipal
           Font.Name = 'Tahoma'
           Font.Style = []
           ParentFont = False
-          TabOrder = 1
+          TabOrder = 2
           Text = 'C:\Integracao\'
         end
       end
