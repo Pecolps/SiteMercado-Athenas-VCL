@@ -4091,7 +4091,6 @@ object frmPrincipal: TfrmPrincipal
     Top = 32
   end
   object tmrEntrada: TTimer
-    Enabled = False
     Interval = 200
     Left = 503
     Top = 36
