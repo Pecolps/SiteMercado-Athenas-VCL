@@ -47,6 +47,12 @@ type
     popbtnProcessarAgora: TMenuItem;
     fdQuery2: TFDQuery;
     LabeledEdit1: TLabeledEdit;
+    tabTemplates: TTabSheet;
+    sbTemplates: TScrollBox;
+    Label2: TLabel;
+    mmTPedidos: TMemo;
+    MMTCliente: TMemo;
+    Label3: TLabel;
     procedure pnTopMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure btnSairClick(Sender: TObject);

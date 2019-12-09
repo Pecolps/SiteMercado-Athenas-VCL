@@ -327,7 +327,7 @@ object frmPrincipal: TfrmPrincipal
     Top = 137
     Width = 618
     Height = 383
-    ActivePage = tabConfig
+    ActivePage = tabTemplates
     Align = alClient
     TabOrder = 2
     object tabPrincipal: TTabSheet
@@ -518,6 +518,96 @@ object frmPrincipal: TfrmPrincipal
         Caption = 'Salvar Configura'#231#245'es'
         TabOrder = 3
         OnClick = btnSalvarClick
+      end
+    end
+    object tabTemplates: TTabSheet
+      Caption = 'Templates'
+      ImageIndex = 2
+      object sbTemplates: TScrollBox
+        Left = 0
+        Top = 0
+        Width = 610
+        Height = 355
+        Align = alClient
+        BevelInner = bvNone
+        BorderStyle = bsNone
+        Color = clWhite
+        ParentColor = False
+        TabOrder = 0
+        object Label2: TLabel
+          Left = 16
+          Top = 16
+          Width = 577
+          Height = 13
+          AutoSize = False
+          Caption = 'Template Pedidos'
+        end
+        object Label3: TLabel
+          Left = 16
+          Top = 136
+          Width = 577
+          Height = 13
+          AutoSize = False
+          Caption = 'Template Clientes'
+        end
+        object mmTPedidos: TMemo
+          Left = 16
+          Top = 35
+          Width = 577
+          Height = 89
+          Enabled = False
+          Lines.Strings = (
+            '{LINEBREAK}'
+            
+              'P;{pedido_codigo_loja};0;{cliente_cpf_cnpj};{pedido_data};{pedid' +
+              'o_total};{cliente_endereco_cep};'
+            '{cliente_endereco};'
+            
+              '{cliente_endereco_numero};{cliente_endereco_bairro};{cliente_end' +
+              'ereco_cidade};{cliente_endereco_estado};'
+            '{LINEBREAK}'
+            '{LOOP}'
+            
+              'I;{pedido_item_codigo_barra};{pedido_item_valor};{pedido_item_qu' +
+              'antidade3};{pedido_item_valor_total};'
+            '{pedido_item_observacao};'
+            '{LINEBREAK}'
+            '{/LOOP}'
+            '{IIF}{pedido_valor_entrega}==0.00||'
+            
+              'I;{pedido_ean_taxa_entrega};{pedido_valor_entrega};1.000;{pedido' +
+              '_valor_entrega};TAXA ENTREGA;'
+            '{LINEBREAK}'
+            '{/IIF}'
+            '{IIF}{pedido_valor_conveniencia}==0.00||'
+            
+              'I;{pedido_ean_taxa_servico};{pedido_valor_conveniencia};1.000;{p' +
+              'edido_valor_conveniencia};TAXA SERVICO;'
+            '{/IIF}')
+          ReadOnly = True
+          TabOrder = 0
+        end
+        object MMTCliente: TMemo
+          Left = 16
+          Top = 155
+          Width = 577
+          Height = 89
+          Enabled = False
+          Lines.Strings = (
+            '{LINEBREAK}'
+            
+              '{cliente_cpf_cnpj};{cliente_nome};{cliente_cpf_cnpj};{cliente_pf' +
+              '_nascimento};{cliente_rg_ie};;{cliente_email};'
+            
+              '{cliente_endereco_cep};{cliente_endereco};{cliente_endereco_nume' +
+              'ro};{cliente_endereco_bairro};'
+            
+              '{cliente_endereco_cidade};{cliente_endereco_estado};{cliente_tel' +
+              'efone_fixo};{cliente_telefone_celular};'
+            '{cliente_endereco_complemento};')
+          ReadOnly = True
+          TabOrder = 1
+        end
       end
     end
   end
