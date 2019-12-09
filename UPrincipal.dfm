@@ -327,7 +327,7 @@ object frmPrincipal: TfrmPrincipal
     Top = 137
     Width = 618
     Height = 383
-    ActivePage = tabPrincipal
+    ActivePage = tabConfig
     Align = alClient
     TabOrder = 2
     object tabPrincipal: TTabSheet
@@ -459,7 +459,7 @@ object frmPrincipal: TfrmPrincipal
         TabOrder = 2
         object edIntervalo: TLabeledEdit
           Left = 16
-          Top = 163
+          Top = 83
           Width = 97
           Height = 21
           EditLabel.Width = 98
@@ -490,23 +490,6 @@ object frmPrincipal: TfrmPrincipal
           Font.Style = []
           ParentFont = False
           TabOrder = 1
-          Text = 'C:\Integracao\'
-        end
-        object LabeledEdit1: TLabeledEdit
-          Left = 16
-          Top = 80
-          Width = 313
-          Height = 21
-          EditLabel.Width = 159
-          EditLabel.Height = 13
-          EditLabel.Caption = 'Caminho de Sa'#237'da (produtos.csv)'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBlack
-          Font.Height = -11
-          Font.Name = 'Tahoma'
-          Font.Style = []
-          ParentFont = False
-          TabOrder = 2
           Text = 'C:\Integracao\'
         end
       end
@@ -4106,5 +4089,16 @@ object frmPrincipal: TfrmPrincipal
     Connection = fdConn
     Left = 448
     Top = 32
+  end
+  object tmrEntrada: TTimer
+    Enabled = False
+    Interval = 200
+    Left = 503
+    Top = 36
+  end
+  object fdQuery3: TFDQuery
+    Connection = fdConn
+    Left = 400
+    Top = 16
   end
 end

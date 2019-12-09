@@ -10,7 +10,7 @@ uses
   FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.VCLUI.Wait,
   Data.DB, FireDAC.Comp.Client, FireDAC.Stan.Param, FireDAC.DatS,
   FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Phys.FB,
-  FireDAC.Phys.FBDef, IniFiles, System.Generics.Collections, Vcl.Menus;
+  FireDAC.Phys.FBDef, IniFiles, System.Generics.Collections, Vcl.Menus, StrUtils, System.Types;
 
 type
   TfrmPrincipal = class(TForm)
@@ -46,13 +46,14 @@ type
     ppbtnSair: TMenuItem;
     popbtnProcessarAgora: TMenuItem;
     fdQuery2: TFDQuery;
-    LabeledEdit1: TLabeledEdit;
     tabTemplates: TTabSheet;
     sbTemplates: TScrollBox;
     Label2: TLabel;
     mmTPedidos: TMemo;
     MMTCliente: TMemo;
     Label3: TLabel;
+    tmrEntrada: TTimer;
+    fdQuery3: TFDQuery;
     procedure pnTopMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure btnSairClick(Sender: TObject);
@@ -325,17 +326,165 @@ begin
       end;
 end;
 
+function zerarcodigo(codigo: string; qtde: integer): string;
+begin
+  while Length(codigo) < qtde do
+    codigo := '0' + codigo;
+  result := codigo;
+end;
+
+function codifica(Tabela: string): string;
+begin
+  with frmPrincipal do
+    begin
+      fdQuery2.Close;
+      fdQuery2.SQL.Clear;
+      fdQuery2.SQL.Add('select * from C000000');
+      fdQuery2.open;
+      fdQuery2.Refresh;
+      if fdQuery2.Locate('codigo', Tabela, [loCaseInsensitive]) then
+      begin
+
+        if fdQuery2.FieldByName('sequencia').asinteger < 1 then
+        begin
+          result := '000001';
+          fdQuery2.Edit;
+          fdQuery2.FieldByName('sequencia').asinteger := 2;
+          fdQuery2.Post;
+        end
+        else
+        begin
+          result := zerarcodigo(inttostr(fdQuery2.FieldByName('sequencia').asinteger), 6);
+          fdQuery2.Edit;
+          fdQuery2.FieldByName('sequencia').asinteger :=
+          fdQuery2.FieldByName('sequencia').asinteger + 1;
+          fdQuery2.Post;
+          fdQuery2.Connection.Commit;
+        end;
+      end
+      else
+      begin
+        Showmessage('Não foi possível concluir com a operação!' + #13 +
+          'Erro: Código de sequência não encontrado na tabela de códigos.');
+        fdQuery2.Connection.Rollback;
+      end;
+    end;
+end;
+
+procedure IniciaProcessoEntradaPedido;
+var
+ArquivoAbertura: TStringList;
+PedidoArray: TStringDynArray;
+i: integer;
+codnota, data: string;
+begin
+   //Processo de Entrada no Sistema
+   with frmPrincipal do
+      begin
+      if FileExists(edCaminhoIntegracao.Text + '\pedidos.csv') then
+        begin
+        tmrSaida.Enabled:= false;
+        Logg('Consumindo arquivo de Pedido...');
+        i:= 0;
+        ArquivoAbertura:= TStringList.Create();
+        ArquivoAbertura.LoadFromFile(edCaminhoIntegracao.Text + '\pedidos.csv');
+        while i <= ArquivoAbertura.Count do
+          begin
+            PedidoArray:= SplitString(ArquivoAbertura[i], ';');
+            if(PedidoArray[0] = 'P')then
+              begin
+              //Processa o Pedido
+              fdQuery.Close;
+              fdquery.SQL.Clear;
+              fdquery.SQL.Add('select * from C000074');
+              fdquery.open;
+              fdquery.First;
+              fdquery.Insert;
+              //Campos Pedido
+              fdquery.fieldbyname('codigo').asstring      := codifica('000048');
+              codnota:= fdquery.fieldbyname('codigo').asstring;
+              fdquery.fieldbyname('tipo').asinteger       := 0;
+              fdquery.fieldbyname('data').asstring        := PedidoArray[4];
+              data:=  PedidoArray[4];
+              fdquery.fieldbyname('codcliente').asstring  := '000001';
+              fdquery.fieldbyname('codvendedor').asstring := '000999'; //Deve-se Cadastrar um vendedor SiteMercado no sistema com esse código
+              fdquery.fieldbyname('codcaixa').asstring    := '000099';
+              fdquery.fieldbyname('TOTAL').asfloat        := strtofloat(PedidoArray[5]);
+              fdquery.fieldbyname('SUBTOTAL').asfloat     := strtofloat(PedidoArray[5]);
+              fdquery.fieldbyname('meio_DINHEIRO').asfloat:= strtofloat(PedidoArray[5]);
+              fdquery.fieldbyname('desconto').asfloat     := 0;
+              fdquery.fieldbyname('acrescimo').asfloat    := 0;
+              fdquery.fieldbyname('OBS').asstring         := 'A VISTA';
+              fdquery.fieldbyname('tipo').asinteger       := 0;
+              fdquery.fieldbyname('situacao').asinteger   := 1;
+              fdquery.Post;
+              fdquery.Connection.Commit;
+              //Pega novamente a linha, dessa vez, supostamente com o item.
+              Inc(i);
+              PedidoArray:= SplitString(ArquivoAbertura[i], ';');
+                while(PedidoArray[0] = 'I')do
+                  begin
+                  //Processa o Item
+                  fdQuery.Close;
+                  fdquery.SQL.Clear;
+                  fdquery.SQL.Add('select * from C000075');
+                  fdquery.open;
+                  fdquery.First;
+                  fdquery.Insert;
+
+                  //Acha Produto
+                  fdQuery3.Close;
+                  fdquery3.SQL.Clear;
+                  fdquery3.SQL.Add('select * from C000025 where CODBARRA = :COD');
+                  fdquery3.ParamByName('cod').AsString:= PedidoArray[1];
+                  fdquery3.open;
+                  fdquery3.First;
+
+                  //Campos Item
+                  fdquery.fieldbyname('codigo').asstring        := codifica('000032');
+                  fdquery.fieldbyname('codnota').asstring       := codnota;
+                  fdquery.fieldbyname('numeronota').asstring    := codnota;
+                  fdquery.fieldbyname('codproduto').asstring    := fdQuery3.fieldbyname('CODIGO').asstring;
+                  fdquery.fieldbyname('nome').asstring          := fdQuery3.fieldbyname('PRODUTO').asstring;
+                  fdquery.fieldbyname('qtde').asfloat           := strtoint(PedidoArray[3]);
+                  fdquery.fieldbyname('unitario').asfloat       := fdQuery3.fieldbyname('PRECOVENDA').asfloat;
+                  fdquery.fieldbyname('total').asfloat          := strtoint(PedidoArray[4]);;
+                  fdquery.fieldbyname('desconto').asfloat       := 0;
+                  fdquery.fieldbyname('acrescimo').asfloat      := 0;
+                  fdquery.fieldbyname('unidade').asstring       := fdQuery3.fieldbyname('UNIDADE').asstring;
+                  fdquery.fieldbyname('codcliente').asstring    := '000001';
+                  fdquery.fieldbyname('codvendedor').asstring   := '000999';
+                  fdquery.fieldbyname('MOVIMENTO').asinteger := 2;
+                  fdquery.fieldbyname('data').asstring := data;
+                  fdquery.post;
+
+                  //Passa para o próximo item
+                  Inc(i);
+                  PedidoArray:= SplitString(ArquivoAbertura[i], ';');
+                  end;
+              end;
+            inc(i);
+          end;
+        end;
+      DeleteFile(edCaminhoIntegracao.Text + '\pedidos.csv');
+      Logg('Arquivo consumido.');
+      //Reinicia Timer
+      tmrSaida.Enabled:= true;
+      end;
+end;
+
 procedure IniciaProcessoSaida;
 var
 i: integer;
 StrTemp: string;
 ArquivoFinal: TStringList;
 begin
+//Processo de Saída
   with frmPrincipal do
     begin
       //Para o timer
       tmrSaida.Enabled:= false;
-      Logg('Iniciando processo...');
+      Logg('Iniciando processo de saída...');
       //Define novo tempo de espera pra ele
       tmrSaida.Interval:= strtoint(edIntervalo.Text) * 1000;
 
