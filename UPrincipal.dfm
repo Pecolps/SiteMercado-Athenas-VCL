@@ -327,7 +327,7 @@ object frmPrincipal: TfrmPrincipal
     Top = 137
     Width = 618
     Height = 383
-    ActivePage = tabTemplates
+    ActivePage = tabPrincipal
     Align = alClient
     TabOrder = 2
     object tabPrincipal: TTabSheet
@@ -620,9 +620,10 @@ object frmPrincipal: TfrmPrincipal
     Left = 448
     Top = 80
   end
-  object tmrPrincipal: TTimer
+  object tmrSaida: TTimer
     Enabled = False
     Interval = 60
+    OnTimer = tmrSaidaTimer
     Left = 391
     Top = 76
   end

@@ -40,7 +40,7 @@ type
     btnSalvar: TButton;
     edIntervalo: TLabeledEdit;
     edCaminhoIntegracao: TLabeledEdit;
-    tmrPrincipal: TTimer;
+    tmrSaida: TTimer;
     Tray: TTrayIcon;
     popTray: TPopupMenu;
     ppbtnSair: TMenuItem;
@@ -67,6 +67,7 @@ type
     procedure popbtnProcessarAgoraClick(Sender: TObject);
     procedure ppbtnSairClick(Sender: TObject);
     procedure btnSalvarClick(Sender: TObject);
+    procedure tmrSaidaTimer(Sender: TObject);
   private
     { Private declarations }
   public
@@ -324,7 +325,7 @@ begin
       end;
 end;
 
-procedure IniciaProcesso;
+procedure IniciaProcessoSaida;
 var
 i: integer;
 StrTemp: string;
@@ -333,10 +334,10 @@ begin
   with frmPrincipal do
     begin
       //Para o timer
-      tmrPrincipal.Enabled:= false;
+      tmrSaida.Enabled:= false;
       Logg('Iniciando processo...');
       //Define novo tempo de espera pra ele
-      tmrPrincipal.Interval:= strtoint(edIntervalo.Text);
+      tmrSaida.Interval:= strtoint(edIntervalo.Text) * 1000;
 
       //Prepara Variáveis
       ArquivoFinal:= TStringList.Create();
@@ -423,7 +424,7 @@ begin
       ArquivoFinal.SaveToFile(edCaminhoIntegracao.Text + '\produtos.csv');
       Logg('Arquivo gerado.');
       //Reinicia Timer
-      tmrPrincipal.Enabled:= true;
+      tmrSaida.Enabled:= true;
     end;
 end;
 
@@ -438,7 +439,7 @@ begin
     begin
       //Lê configuração existente
       LerConfiguracoes();
-      IniciaProcesso();
+      IniciaProcessoSaida();
     end
       else
         begin
@@ -469,12 +470,17 @@ end;
 
 procedure TfrmPrincipal.popbtnProcessarAgoraClick(Sender: TObject);
 begin
-IniciaProcesso;
+IniciaProcessoSaida;
 end;
 
 procedure TfrmPrincipal.ppbtnSairClick(Sender: TObject);
 begin
 Application.Terminate;
+end;
+
+procedure TfrmPrincipal.tmrSaidaTimer(Sender: TObject);
+begin
+  IniciaProcessoSaida;
 end;
 
 procedure TfrmPrincipal.TrayClick(Sender: TObject);
@@ -486,7 +492,7 @@ end;
 procedure TfrmPrincipal.btnSalvarClick(Sender: TObject);
 begin
   GravaConfiguracoes;
-  IniciaProcesso;
+  IniciaProcessoSaida;
   frmprincipal.Hide;
 end;
 
